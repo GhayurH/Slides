@@ -1,18 +1,18 @@
-# Batch convert all .ppt/.pptx files encountered in folder and all its subfolders
-# The produced PDF files are stored in the invocation folder
-#
-# Adapted from http://stackoverflow.com/questions/16534292/basic-powershell-batch-convert-word-docx-to-pdf
-# Thanks to MFT, takabanana, ComFreek
-#
 # If PowerShell exits with an error, check if unsigned scripts are allowed in your system.
 # You can allow them by calling PowerShell as an Administrator and typing
 # ```
-Set-ExecutionPolicy Unrestricted
+# Set-ExecutionPolicy Unrestricted
 # ```
+
+# Batch convert all .ppt/.pptx files encountered in folder and all its subfolders
+# The produced PDF files are stored in the invocation folder
+#
 # Get invocation path
 $curr_path = Split-Path -parent $MyInvocation.MyCommand.Path
+
 # Create a PowerPoint object
 $ppt_app = New-Object -ComObject PowerPoint.Application
+
 # Get all objects of type .ppt? in $curr_path and its subfolders
 Get-ChildItem -Path $curr_path -Recurse -Filter *.ppt? | ForEach-Object {
     Write-Host "Processing" $_.FullName "..."
@@ -27,6 +27,7 @@ Get-ChildItem -Path $curr_path -Recurse -Filter *.ppt? | ForEach-Object {
     # Close PowerPoint file
     $document.Close()
 }
+
 # Exit and release the PowerPoint object
 $ppt_app.Quit()
 [System.Runtime.Interopservices.Marshal]::ReleaseComObject($ppt_app)
