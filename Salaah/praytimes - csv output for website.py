@@ -413,10 +413,14 @@ def save_prayer_times_to_csv(prayer_times_list, output_file):
     # Convert the list of dictionaries to a DataFrame
     df = pd.DataFrame(prayer_times_list)
 
-    # Add additional columns with default values of zero
-    additional_columns = ['fajr_jamah', 'asr_mithl_1', 'asr_mithl_2', 'asr_jamah', 'isha_begins', 'isha_jamah', 'is_ramadan', 'hijri_date']
-    for column in additional_columns:
-        df[column] = 0
+    # Initialize specific columns with time formatted as "00:00"
+    time_formatted_columns = ['fajr_jamah', 'asr_mithl_1', 'asr_mithl_2', 'asr_jamah', 'isha_begins', 'isha_jamah']
+    for column in time_formatted_columns:
+        df[column] = '00:00'
+
+    # Initialize 'is_ramadan' and 'hijri_date' with 0
+    df['is_ramadan'] = 0
+    df['hijri_date'] = 0
 
     # Rename columns
     columns_mapping = {
