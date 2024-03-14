@@ -413,23 +413,28 @@ def save_prayer_times_to_csv(prayer_times_list, output_file):
     # Convert the list of dictionaries to a DataFrame
     df = pd.DataFrame(prayer_times_list)
 
+    # Add additional columns with default values of zero
+    additional_columns = ['fajr_jamah', 'asr_mithl_1', 'asr_mithl_2', 'asr_jamah', 'isha_begins', 'isha_jamah', 'is_ramadan', 'hijri_date']
+    for column in additional_columns:
+        df[column] = 0
+
     # Rename columns
     columns_mapping = {
         'Date': 'd_date',
         'fajr': 'fajr_begins',
         'sunrise': 'sunrise',
         'dhuhr': 'zuhr_begins',
-        'sunset': 'sunset',
+        'sunset': 'zuhr_jamah',
         'maghrib': 'maghrib_begins',
-        'midnight': 'midnight'
+        'midnight': 'maghrib_jamah'
     }
     df.rename(columns=columns_mapping, inplace=True)
 
     # Manually format 'd_date' to "m/dd/yyyy"
     df['d_date'] = df['d_date'].apply(lambda x: datetime.strptime(x, '%Y-%m-%d').strftime('%m/%d/%Y').lstrip("0").replace('/0','/'))
 
-    # Specify new order for the columns
-    new_order = ['d_date', 'fajr_begins', 'sunrise', 'zuhr_begins', 'sunset', 'maghrib_begins', 'midnight']
+    # Specify new order for the columns, including new keys
+    new_order = ['d_date', 'fajr_begins', 'fajr_jamah', 'sunrise', 'zuhr_begins', 'zuhr_jamah', 'asr_mithl_1', 'asr_mithl_2', 'asr_jamah', 'maghrib_begins', 'maghrib_jamah', 'isha_begins', 'isha_jamah', 'is_ramadan', 'hijri_date']
     df = df[new_order]
 
     # Save the DataFrame to a CSV file
@@ -437,7 +442,7 @@ def save_prayer_times_to_csv(prayer_times_list, output_file):
 
 
 # Iterate over all valid days in the year 2024 and calculate prayer times
-start_year, end_year = 2024, 2024
+start_year, end_year = 2024, 2034
 coordinates = [43.493056, -80.501111]
 
 all_prayer_times = []
