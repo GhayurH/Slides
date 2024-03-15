@@ -41,4 +41,4 @@ $ppt_app.Quit()
 [System.Runtime.Interopservices.Marshal]::ReleaseComObject($ppt_app)
 
 # Move files to PDF folder if needed
-mv *.pdf ../PDFs/
+Move-Item *.pdf ../PDFs/ -Force
