@@ -1,7 +1,9 @@
 import os
 import csv
 from difflib import SequenceMatcher
-#this code is extremely slow and largely useless. need to refine 
+
+# this code is extremely slow and (largely) useless. need to refine
+
 def similar(a, b):
     return SequenceMatcher(None, a, b).ratio()
 
