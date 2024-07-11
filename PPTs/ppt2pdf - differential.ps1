@@ -22,15 +22,25 @@ $ppt_app = New-Object -ComObject PowerPoint.Application
 # Get all objects of type .ppt? in $curr_path and its subfolders that have been modified since the last run
 Get-ChildItem -Path $curr_path -Recurse -Filter *.ppt? | Where-Object { $_.LastWriteTime -gt $last_run_timestamp } | ForEach-Object {
     Write-Host "Processing" $_.FullName "..."
-    # Open it in PowerPoint
-    $document = $ppt_app.Presentations.Open($_.FullName)
-    # Create a name for the PDF document
-    $pdf_filename = Join-Path $curr_path "$($_.BaseName).pdf"
-    # Save as PDF
-    $opt = [Microsoft.Office.Interop.PowerPoint.PpSaveAsFileType]::ppSaveAsPDF
-    $document.SaveAs($pdf_filename, $opt)
-    # Close PowerPoint file
-    $document.Close()
+    try {
+        # Open it in PowerPoint
+        $document = $ppt_app.Presentations.Open($_.FullName)
+        # Create a name for the PDF document
+        $pdf_filename = Join-Path $curr_path "$($_.BaseName).pdf"
+        # Save as PDF
+        $opt = [Microsoft.Office.Interop.PowerPoint.PpSaveAsFileType]::ppSaveAsPDF
+        $document.SaveAs($pdf_filename, $opt)
+        # Close PowerPoint file
+        $document.Close()
+        [System.Runtime.Interopservices.Marshal]::ReleaseComObject($document) | Out-Null
+    } catch {
+        Write-Host "Error processing $($_.FullName): $_"
+    } finally {
+        if ($document -ne $null) {
+            $document.Close()
+            [System.Runtime.Interopservices.Marshal]::ReleaseComObject($document) | Out-Null
+        }
+    }
 }
 
 # Update the last run timestamp
@@ -38,7 +48,11 @@ Get-ChildItem -Path $curr_path -Recurse -Filter *.ppt? | Where-Object { $_.LastW
 
 # Exit and release the PowerPoint object
 $ppt_app.Quit()
-[System.Runtime.Interopservices.Marshal]::ReleaseComObject($ppt_app)
+[System.Runtime.Interopservices.Marshal]::ReleaseComObject($ppt_app) | Out-Null
 
 # Move files to PDF folder if needed
 Move-Item *.pdf ../PDFs/ -Force
+
+# Cleanup
+[System.GC]::Collect()
+[System.GC]::WaitForPendingFinalizers()
